@@ -152,8 +152,7 @@ class _ListTileBackgroundStateWidget extends StatefulWidget {
       if (onTapDown != null) 'tap down',
       if (onTapCancel != null) 'tap cancel',
     ];
-    properties
-        .add(IterableProperty<String>('gestures', gestures, ifEmpty: '<none>'));
+    properties.add(IterableProperty<String>('gestures', gestures, ifEmpty: '<none>'));
   }
 }
 
@@ -165,28 +164,22 @@ enum _HighlightType {
 
 class _ListTileBackgroundState extends State<_ListTileBackgroundStateWidget> {
   bool _hovering = false;
-  Map<LocalKey, Action<Intent>> _actionMap;
+  Map<Type, Action<Intent>> _actionMap;
   Color _highlightColor;
 
-  void _handleAction(FocusNode node, Intent intent) {
-    _handleTap(node.context);
-  }
-
-  Action _createAction() {
-    return CallbackAction(
-      ActivateAction.intentKey,
-      onInvoke: _handleAction,
-    );
+  void _handleAction(Intent intent) {
+    _handleTap(null);
   }
 
   @override
   void initState() {
     super.initState();
-    _actionMap = <LocalKey,  Action<Intent>>{
-      ActivateAction.intentKey: _createAction,
+    _actionMap = <Type, Action<Intent>>{
+      ActivateAction: CallbackAction(
+        onInvoke: _handleAction,
+      ),
     };
-    FocusManager.instance
-        .addHighlightModeListener(_handleFocusHighlightModeChange);
+    FocusManager.instance.addHighlightModeListener(_handleFocusHighlightModeChange);
   }
 
   @override
@@ -200,8 +193,7 @@ class _ListTileBackgroundState extends State<_ListTileBackgroundStateWidget> {
 
   @override
   void dispose() {
-    FocusManager.instance
-        .removeHighlightModeListener(_handleFocusHighlightModeChange);
+    FocusManager.instance.removeHighlightModeListener(_handleFocusHighlightModeChange);
     super.dispose();
   }
 
@@ -273,6 +265,7 @@ class _ListTileBackgroundState extends State<_ListTileBackgroundStateWidget> {
   }
 
   bool _hasFocus = false;
+
   void _handleFocusUpdate(bool hasFocus) {
     _hasFocus = hasFocus;
     _updateFocusHighlights();
@@ -320,15 +313,15 @@ class _ListTileBackgroundState extends State<_ListTileBackgroundStateWidget> {
   }
 
   bool _isWidgetEnabled(_ListTileBackgroundStateWidget widget) {
-    return widget.onTap != null ||
-        widget.onDoubleTap != null ||
-        widget.onLongPress != null;
+    return widget.onTap != null || widget.onDoubleTap != null || widget.onLongPress != null;
   }
 
   bool get enabled => _isWidgetEnabled(widget);
 
   void _handleMouseEnter(PointerEnterEvent event) => _handleHoverChange(true);
+
   void _handleMouseExit(PointerExitEvent event) => _handleHoverChange(false);
+
   void _handleHoverChange(bool hovering) {
     if (_hovering != hovering) {
       _hovering = hovering;
@@ -356,9 +349,7 @@ class _ListTileBackgroundState extends State<_ListTileBackgroundStateWidget> {
             onTap: enabled ? () => _handleTap(context) : null,
             onTapCancel: enabled ? _handleTapCancel : null,
             onDoubleTap: widget.onDoubleTap != null ? _handleDoubleTap : null,
-            onLongPress: widget.onLongPress != null
-                ? () => _handleLongPress(context)
-                : null,
+            onLongPress: widget.onLongPress != null ? () => _handleLongPress(context) : null,
             behavior: HitTestBehavior.opaque,
             excludeFromSemantics: widget.excludeFromSemantics,
             child: Container(
